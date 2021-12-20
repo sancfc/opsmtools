@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # opsmtools.py - expose various MongoDB
 # Ops Manager API endpoint through a simple
@@ -22,7 +22,7 @@ import ast
 # verbose print message only if args.verbose=True
 def vprint(message,args):
     if args.verbose==True:
-        print message
+        print(message)
 
 # print out list of snapshots for a given cluster/replset id
 def get_snapshots(args):
@@ -69,7 +69,7 @@ def get_snapshots(args):
     if AsciiTable:
         table = AsciiTable( table_data, host_info );
         table.inner_footing_row_border = True
-        print table.table
+        print(table.table)
     else:
         import pprint
         pprint.pprint(table_data)
@@ -121,7 +121,7 @@ def create_restore(args):
         vprint("======= restore_json =========",args)
         restoreUrl = restore_json.get('links')[0].get('href')
         restoreStatus = restore_json.get('statusName')
-    print "Restore complete."
+    print("Restore complete.")
     downloadUrl = restore_json.get('delivery').get("url")
     filename = downloadUrl.split('/')[-1]
     if hasattr(args,'outDirectory'):
@@ -129,7 +129,7 @@ def create_restore(args):
             args.outDirectory = args.outDirectory + os.sep
             vars(args)['outDirectory'] = args.outDirectory
         filename = args.outDirectory + filename
-    print "Downloading from " + downloadUrl + " saving to " + filename
+    print("Downloading from " + downloadUrl + " saving to " + filename)
     response = requests.get(downloadUrl,
             auth=HTTPDigestAuth(args.username,args.apikey),
             stream=True)
@@ -256,45 +256,6 @@ def create_restore_and_deploy(args):
     #TODO: shutdown temp mongod & blow away dbpath?
     os.kill(int(temp_mongod_pid), signal.SIGKILL)
 
-# print out nice table of hosts & id's
-def get_hosts(args):
-    try:
-        from terminaltables import AsciiTable
-    except ImportError:
-        AsciiTable = False
-        pass
-    response= requests.get(args.host+"/api/public/v1.0/groups/"+args.group+"/hosts/"
-             ,auth=HTTPDigestAuth(args.username,args.apikey))
-    response.raise_for_status()
-    vprint("============= response ==============",args)
-    vprint( vars(response),args )
-    vprint("============= end response ==============",args)
-
-    hosts_json = response.json()
-
-    table_data = [
-        ['hostname','id','clusterId','version','typeName','replicaSetName','replicaStateName','lastPing']
-    ]
-
-    for host in hosts_json['results']:
-        row = []
-        for column in table_data[0]:
-            row.append( str( host.get(column) ) )
-        table_data.append( row );
-
-    table_data.append(['','','Number of hosts',str(hosts_json['totalCount'])])
-
-    host_info = 'Hosts from ' + args.host
-
-    if AsciiTable:
-        table = AsciiTable( table_data, host_info );
-        table.inner_footing_row_border = True
-        print table.table
-    else:
-        import pprint
-        pprint.pprint(table_data)
-
-
 # print out list of clusters.
 def get_clusters(args):
     try:
@@ -328,7 +289,10 @@ def get_clusters(args):
     if AsciiTable:
         table = AsciiTable( table_data, host_info );
         table.inner_footing_row_border = True
-        print table.table
+        #print(table.table)
+        #print(hosts_json)
+        #print(json.dumps(hosts_json, indent=4, sort_keys=True))
+        print(json.dumps(hosts_json))
     else:
         import pprint
         pprint.pprint(table_data)
@@ -344,7 +308,7 @@ def get_automation_config(args):
 
     hosts_json = response.json()
 
-    print json.dumps(hosts_json, indent=4, sort_keys=True)
+    print(json.dumps(hosts_json, indent=4, sort_keys=True))
 
 # modify settings within the automation config
 def set_automation_config(args):
@@ -400,11 +364,12 @@ def get_hosts(args):
     if AsciiTable:
         table = AsciiTable( table_data, host_info );
         table.inner_footing_row_border = True
-        print table.table
+        print(table.table)
+        #print(json.dumps(hosts_json, indent=4, sort_keys=True))
+        #print(json.dumps(hosts_json))
     else:
         import pprint
         pprint.pprint(table_data)
-
 
 def get_alerts(args):
     try:
@@ -445,7 +410,7 @@ def get_alerts(args):
     if AsciiTable:
         table = AsciiTable( table_data, host_info );
         table.inner_footing_row_border = True
-        print table.table
+        print(table.table)
     else:
         if args.format=='json':
             print(json.dumps(alerts_json))
@@ -519,14 +484,14 @@ def delete_alert_configs(args):
         vprint( vars(response),args )
         vprint("============= end response ==============",args)
         if args.continueOnError and (response.status_code != requests.codes.ok):
-            print "ERROR %s %s" % (response.status_code,response.reason)
+            print("ERROR %s %s" % (response.status_code,response.reason))
             print( "Failed migration alert JSON:" )
-            print json.dumps(new_alert)
+            print(json.dumps(new_alert))
             failed_deletions += 1
         else:
             response.raise_for_status()
             deleted_alerts += 1
-    print "Deleted %d alerts to %s (%d failures)" % (deleted_alerts,args.targetHost,failed_deletions)
+    print("Deleted %d alerts to %s (%d failures)" % (deleted_alerts,args.targetHost,failed_deletions))
 
     print( vars(response) )
 
@@ -537,7 +502,7 @@ def post_alert_configs(args):
         data = sys.stdin.read()
     else:
         data = open( args.alertConfigsSource, 'r').read()
-    print data
+    print(data)
     alert_configs = json.loads(data)
     vprint("============= SOURCE alert data ==============",args)
     vprint( json.dumps(alert_configs),args )
@@ -591,14 +556,23 @@ def __post_alert_configs(args,alert_configs):
         vprint( vars(response),args )
         vprint("============= end response ==============",args)
         if args.continueOnError and (response.status_code != requests.codes.created):
-            print "ERROR %s %s" % (response.status_code,response.reason)
+            print("ERROR %s %s" % (response.status_code,response.reason))
             print( "Failed migration alert JSON:" )
-            print json.dumps(new_alert)
+            print(json.dumps(new_alert))
             failed_migrations += 1
         else:
             response.raise_for_status()
             migrated_alerts += 1
-    print "Migrated %d alerts to %s (%d failures)" % (migrated_alerts,args.targetHost,failed_migrations)
+    print("Migrated %d alerts to %s (%d failures)" % (migrated_alerts,args.targetHost,failed_migrations))
+
+## Changes by Francis Santiago 
+def monitor_hosts(args):
+    response= requests.get(args.host+"/api/public/v1.0/groups/"+args.group+"/hosts/"
+             ,auth=HTTPDigestAuth(args.username,args.apikey))
+    response.raise_for_status()
+    hosts_json = response.json()
+    #print(json.dumps(hosts_json, indent=4, sort_keys=True))
+    print(json.dumps(hosts_json))
 
 # "main"
 parser = argparse.ArgumentParser(description="Get alerts from MongoDB Ops/Cloud Manager")
@@ -621,6 +595,9 @@ parser.add_argument("--getClusters",dest='action', action='store_const'
 parser.add_argument("--getHosts",dest='action', action='store_const'
         ,const=get_hosts
         ,help='get host information')
+parser.add_argument("--monitorHosts",dest='action', action='store_const'
+        ,const=monitor_hosts
+        ,help='Monitor host information return 0 or 1')
 parser.add_argument("--getAlerts",dest='action', action='store_const'
         ,const=get_alerts
         ,help='get alerts')

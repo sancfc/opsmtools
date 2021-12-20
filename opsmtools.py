@@ -565,14 +565,20 @@ def __post_alert_configs(args,alert_configs):
             migrated_alerts += 1
     print("Migrated %d alerts to %s (%d failures)" % (migrated_alerts,args.targetHost,failed_migrations))
 
-## Changes by Francis Santiago 
+## Changes by Francis Santiago
 def monitor_hosts(args):
     response= requests.get(args.host+"/api/public/v1.0/groups/"+args.group+"/hosts/"
              ,auth=HTTPDigestAuth(args.username,args.apikey))
     response.raise_for_status()
     hosts_json = response.json()
-    #print(json.dumps(hosts_json, indent=4, sort_keys=True))
-    print(json.dumps(hosts_json))
+    #print(json.dumps(hosts_json))
+    #print (hosts_json['totalCount'])
+    totalCount = (hosts_json['totalCount'])
+    if totalCount <= 3:
+        print("Ok")
+    else:
+        print("There is a down node")
+
 
 # "main"
 parser = argparse.ArgumentParser(description="Get alerts from MongoDB Ops/Cloud Manager")

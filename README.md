@@ -44,7 +44,7 @@ Usage
 
 ```
 usage: opsmtools.py [-h] --host HOST --group GROUP --username USERNAME
-                    --apikey APIKEY [--getClusters] [--getHosts] [--getAlerts]
+                    --apikey APIKEY [--getClusters] [--getHosts][--monitorHosts][--getAlerts]
                     [--getAlertConfigs] [--deleteAlertConfigs]
                     [--postAlertConfigs] [--migrateAlertConfigs]
                     [--getSnapshots] [--createRestore] [--createRestoreLatest]
@@ -72,6 +72,7 @@ optional arguments:
   -h, --help            show this help message and exit
   --getClusters         get cluster information
   --getHosts            get host information
+  --monitorHosts        Host monitoring information
   --getAlerts           get alerts
   --getAlertConfigs     get alert configurations
   --deleteAlertConfigs  delete ALL alert configs from host

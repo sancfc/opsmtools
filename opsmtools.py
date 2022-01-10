@@ -19,6 +19,12 @@ import tarfile
 import subprocess, signal
 import ast
 
+# return codes
+UNKNOWN = -1
+OK = 0
+WARNING = 1
+CRITICAL = 2
+
 # verbose print message only if args.verbose=True
 def vprint(message,args):
     if args.verbose==True:
@@ -576,9 +582,11 @@ def monitor_hosts(args):
     totalCount = (hosts_json['totalCount'])
     if totalCount <= 3:
         print("Ok")
+        sys.exit(OK)
+
     else:
         print("There is a down node")
-
+        sys.exit(CRITICAL)
 
 # "main"
 parser = argparse.ArgumentParser(description="Get alerts from MongoDB Ops/Cloud Manager")
